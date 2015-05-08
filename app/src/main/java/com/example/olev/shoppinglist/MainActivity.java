@@ -28,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         ListView productList=(ListView)findViewById(R.id.productList);
         adapter= new CustomAdapter(this,DataProcess.getInstance().myList);
+        
        productList.setAdapter(adapter);
 
     }
