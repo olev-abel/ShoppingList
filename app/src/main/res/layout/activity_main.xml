@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/productList"
-        android:layout_below="@+id/addNewProduct"
+        android:layout_below="@+id/productListHeader"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -29,10 +29,24 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/userInput"
         android:width="240dp"
-        android:layout_alignParentTop="true"
+        android:hint="@string/product_name_placeholder"
+        android:visibility="invisible"
+        android:imeOptions="actionSend"
+        android:singleLine="true"
+        android:layout_above="@+id/productListHeader"
         android:layout_toLeftOf="@+id/addNewProduct"
         android:layout_toStartOf="@+id/addNewProduct" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/product_list_header"
+        android:id="@+id/productListHeader"
+        android:layout_below="@+id/addNewProduct"
+        android:layout_alignLeft="@+id/userInput"
+        android:layout_alignStart="@+id/userInput" />
 
 </RelativeLayout>

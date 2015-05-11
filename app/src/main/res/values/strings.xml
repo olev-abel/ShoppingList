@@ -4,10 +4,15 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="add_new_product_button_text">+</string>
-    <string name="product_name">Product Name</string>
     <string name="check_button_text">Put into Basket</string>
     <string name="remove_button_text">Remove item</string>
     <string name="title_activity_add_item">AddItem</string>
     <string name="add_product_button_text">Add Product</string>
-    <string name="product_name_placeholder_text">Enter product name</string>
+    <string name="product_name_placeholder">Enter product name</string>
+    <string name="product_list_header">Products</string>
+    <string name="product_name">Product Name</string>
+    <string name="checked_button_text">Mark as Checked</string>
+    <string name="delete_product_button_text">Delete Product</string>
+
+
 </resources>
