@@ -60,6 +60,8 @@ public class MainActivity extends Activity  implements DbItemDeleteListener{
 
 
     public void getProductsFromDb() {
+        productnames.clear();
+
         ArrayList<Product> products=dbhandler.getProducts();
         productnames.addAll(products);
         adapter.notifyDataSetChanged();
