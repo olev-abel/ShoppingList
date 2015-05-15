@@ -49,8 +49,10 @@ public class DBHandler  extends SQLiteOpenHelper{
     public void deleteProduct(String productname){
         SQLiteDatabase db=getWritableDatabase();
         String[] args = {productname};
+
         db.delete(TABLE_PRODUCTS, COLUMN_PRODUCTNAME + "= ?", args);
     }
+
 
     public ArrayList<Product> getProducts(){
         ArrayList<Product> products= new ArrayList<>();
