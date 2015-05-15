@@ -11,8 +11,10 @@
     <string name="product_name_placeholder">Enter product name</string>
     <string name="product_list_header">Products</string>
     <string name="product_name">Product Name</string>
-    <string name="checked_button_text">Mark as Checked</string>
-    <string name="delete_product_button_text">Delete Product</string>
+    <string name="checked_button_text">Check</string>
+    <string name="delete_product_button_text">Delete</string>
+    <string name="delete_dialog_text">Delete product?</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>

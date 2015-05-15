@@ -23,10 +23,10 @@ public class DBHandler  extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query= "CREATE TABLE" + TABLE_PRODUCTS + "("+
-                COLUMN_ID + "INTEGER PRIMARY KEY AUTOINCREMENT" +
-                COLUMN_PRODUCTNAME + "TEXT" +
-                COLUMN_ISCHECKED + "BOOLEAN" +
+        String query= "CREATE TABLE " + TABLE_PRODUCTS + " ("+
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_PRODUCTNAME + " TEXT," +
+                COLUMN_ISCHECKED + " BOOLEAN" +
                 ");";
         db.execSQL(query);
     }
@@ -45,23 +45,24 @@ public class DBHandler  extends SQLiteOpenHelper{
         db.insert(TABLE_PRODUCTS,null,values);
         db.close();
     }
-    public void deleteProduct(Product product){
+    public void deleteProduct(String productname){
         SQLiteDatabase db=getWritableDatabase();
-        db.execSQL("DELETE FROM" +TABLE_PRODUCTS+ "WHERE "+ COLUMN_PRODUCTNAME+ "=\""+ product.get_productname() +"\";");
+        db.execSQL("DELETE FROM " +TABLE_PRODUCTS+ " WHERE "+ COLUMN_PRODUCTNAME+ "=\" "+ productname +"\";");
         }
 
-    public ArrayList<Product> getProductsFromDb(){
+    public ArrayList<Product> getProducts(){
         ArrayList<Product> products= new ArrayList<>();
         SQLiteDatabase db=getWritableDatabase();
-        String query= "SELECT * FROM"+ TABLE_PRODUCTS + "WHERE 1";
+        String query= "SELECT * FROM "+ TABLE_PRODUCTS +";";
 
         Cursor c= db.rawQuery(query,null);
         c.moveToFirst();
         while (!c.isAfterLast()){
             if(c.getString(c.getColumnIndex("productname"))!=null){
-                Product product=new Product(Integer.parseInt(c.getString(c.getColumnIndex(COLUMN_ID))),COLUMN_PRODUCTNAME,Boolean.valueOf(c.getString(c.getColumnIndex(COLUMN_ISCHECKED))));
+                Product product=new Product(Integer.parseInt(c.getString(c.getColumnIndex(COLUMN_ID))),c.getString(c.getColumnIndex(COLUMN_PRODUCTNAME)),Boolean.valueOf(c.getString(c.getColumnIndex(COLUMN_ISCHECKED))));
                 products.add(product);
             }
+            c.moveToNext();
         }
         db.close();
         return products;
