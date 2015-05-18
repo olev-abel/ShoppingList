@@ -15,6 +15,11 @@
     <string name="delete_product_button_text">Delete</string>
     <string name="delete_dialog_text">Delete product?</string>
     <string name="cancel">Cancel</string>
+    <string name="add_product_dialog_title">Add Product</string>
+    <string name="add_product_dialog_message">Add a new product to list</string>
+    <string name="add_product_dialog_add_button_text">New Button</string>
+    <string name="add_product_dialog_cancel_button_text">Cancel</string>
+    <string name="delete_list">Delete List</string>
 
 
 </resources>

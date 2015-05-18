@@ -4,14 +4,15 @@ package com.example.olev.shoppinglist;
 
 
 import android.content.Context;
-import android.graphics.Color;
+
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
@@ -21,25 +22,39 @@ class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
     private LayoutInflater inflater;
     List<Product> products= Collections.emptyList();
     public DbItemDeleteListener deleteListener;
+    public DbItemChangeListener changeListener;
 
 
-    public CustomAdapter(Context context,List<Product> products,DbItemDeleteListener deleteListener){
+    public CustomAdapter(Context context,List<Product> products,DbItemDeleteListener deleteListener,DbItemChangeListener changeListener){
         inflater=LayoutInflater.from(context);
         this.products=products;
         this.deleteListener = deleteListener;
+        this.changeListener = changeListener;
 
     }
 
-     public void delete(int position){
-         products.remove(position);
-         notifyItemRemoved(position);
-     }
+
+
+    public void check(int position){
+        Product product=products.get(position);
+        product.set_checked(true);
+    }
+    public void uncheck(int position){
+        Product product=products.get(position);
+        product.set_checked(false);
+    }
+
+    public Product getProduct(int position){
+        Product product=products.get(position);
+        return product;
+    }
 
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=inflater.inflate(R.layout.custom_list_row,parent,false);
         MyViewHolder holder=new MyViewHolder(view);
+
 
 
         return holder;
@@ -49,6 +64,12 @@ class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Product currentProduct=products.get(position);
         holder.productname.setText(currentProduct.get_productname());
+        if(currentProduct.is_checked()) {
+            holder.checkIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.checkIcon.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -66,6 +87,7 @@ class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
         public MyViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+
             productname= (TextView) itemView.findViewById(R.id.ProductName);
             checkButton= (Button) itemView.findViewById(R.id.checkButton);
             deleteButton= (Button) itemView.findViewById(R.id.deleteButton);
@@ -96,16 +118,20 @@ class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
             checkButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(checkIcon.getVisibility()==View.VISIBLE){
+                    if(getProduct(getPosition()).is_checked()){
+                        uncheck(getPosition());
+                        changeListener.change(getProduct(getPosition()));
                         checkIcon.setVisibility(View.GONE);
                         checkButton.setVisibility(View.GONE);
                         deleteButton.setVisibility(View.GONE);
                         checkButton.setText("Check");
 
                     }else{
-                   checkIcon.setVisibility(View.VISIBLE);
-                   checkButton.setVisibility(View.GONE);
-                   deleteButton.setVisibility(View.GONE);
+                        check(getPosition());
+                        changeListener.change(getProduct(getPosition()));
+                        checkIcon.setVisibility(View.VISIBLE);
+                        checkButton.setVisibility(View.GONE);
+                        deleteButton.setVisibility(View.GONE);
                 }
                 }
 
@@ -114,6 +140,8 @@ class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
                 @Override
                 public void onClick(View v) {
                     deleteListener.delete(productname.getText().toString());
+                    checkButton.setVisibility(View.GONE);
+                    deleteButton.setVisibility(View.GONE);
 
                 }
             });

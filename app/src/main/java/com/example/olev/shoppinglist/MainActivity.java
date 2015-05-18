@@ -1,56 +1,37 @@
 package com.example.olev.shoppinglist;
 
 
-
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-
-
 import com.melnykov.fab.FloatingActionButton;
-
 import java.util.ArrayList;
 
 
-public class MainActivity extends ActionBarActivity implements DbItemDeleteListener{
+public class MainActivity extends ActionBarActivity implements DbItemDeleteListener,DbItemChangeListener{
     RecyclerView recyclerView;
     CustomAdapter adapter;
     ArrayList<Product> productnames=new ArrayList<>();
+    ArrayList<String> names=new ArrayList<>();
     DBHandler dbhandler;
     Toolbar toolbar;
+    ArrayAdapter<String> autoCompleteAdapter;
 
-    @Override
-    public void delete(final String productId){
-        AlertDialog.Builder deleteAlert=new AlertDialog.Builder(this);
-        deleteAlert.setMessage("Delete Product?")
-                .setPositiveButton("Delete",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog,int which){
-                        dbhandler.deleteProduct(productId);
-                        getProductsFromDb();
-                    }
-                }).setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }).setTitle("Delete")
-                .create();
-        deleteAlert.show();
 
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +39,9 @@ public class MainActivity extends ActionBarActivity implements DbItemDeleteListe
         setContentView(R.layout.activity_main);
         toolbar= (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-
-
-
-
         recyclerView=(RecyclerView)findViewById(R.id.productList);
+        autoCompleteAdapter= new ArrayAdapter<>(this,android.R.layout.simple_dropdown_item_1line,names);
+
 
         FloatingActionButton fab= (FloatingActionButton) findViewById(R.id.fab);
         fab.attachToRecyclerView(recyclerView);
@@ -70,81 +49,99 @@ public class MainActivity extends ActionBarActivity implements DbItemDeleteListe
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Product newProduct= new Product();
-                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-                alertDialog.setTitle("ADD PRODUCT");
-                alertDialog.setMessage("Add a new product");
 
-                final EditText input = new EditText(MainActivity.this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
-                input.setLayoutParams(lp);
-                input.setHint("Enter product name");
-                alertDialog.setView(input);
+                final Product newProduct = new Product();
+                final Dialog addProductDialog = new Dialog(MainActivity.this);
+                addProductDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                addProductDialog.setContentView(R.layout.add_product_dialog);
+                final AutoCompleteTextView userInput = (AutoCompleteTextView) addProductDialog.findViewById(R.id.userInput);
 
-                alertDialog.setPositiveButton("Add",new DialogInterface.OnClickListener() {
+                userInput.setAdapter(autoCompleteAdapter);
+                getNamesFromDb();
+                userInput.setThreshold(2);
+
+                Button addButton = (Button) addProductDialog.findViewById(R.id.AddProductDialogAddButton);
+                Button cancelButton = (Button) addProductDialog.findViewById(R.id.AddProductDialogCancelButton);
+                addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        newProduct.set_productname(input.getText().toString());
-                        newProduct.set_checked(false);
+                    public void onClick(View v) {
+                        newProduct.set_productname(userInput.getText().toString());
+                        newProduct.set_checked(newProduct.is_checked());
                         productnames.add(newProduct);
+                        autoCompleteAdapter.add(newProduct.get_productname());
                         dbhandler.addProduct(newProduct);
-                        adapter.notifyItemInserted(productnames.size()-1);
+                        dbhandler.addName(newProduct);
+                        autoCompleteAdapter.notifyDataSetChanged();
+
+                        adapter.notifyItemInserted(productnames.size() - 1);
+                        addProductDialog.dismiss();
+                    }
+                });
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addProductDialog.dismiss();
                     }
                 });
 
-                alertDialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-            alertDialog.show();
+                addProductDialog.show();
             }
         });
 
         dbhandler=new DBHandler(this,null,null,1);
-        adapter= new CustomAdapter(this,productnames,this);
+        adapter= new CustomAdapter(this,productnames,this,this);
         getProductsFromDb();
+
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
     }
 
-
-
-   /* public void addNewProduct(View view){
-        EditText userInput=(EditText)findViewById(R.id.userInput);
-        userInput.setVisibility(View.VISIBLE);
-        String productname=userInput.getText().toString();
-
-        if(productname.equals(""))return;
-
-        Product product=new Product();
-        product.set_productname(productname);
-        product.set_checked(false);
-        productnames.add(product);
-        dbhandler.addProduct(product);
-        adapter.notifyItemInserted(productnames.size()-1);
-        userInput.setText("");
-
-    }*/
-
-
+    public void getNamesFromDb(){
+        names.clear();
+        ArrayList<String> n=dbhandler.getNames();
+        names.addAll(n);
+        Log.v("lamp",Integer.toString(names.size()));
+        autoCompleteAdapter.notifyDataSetChanged();
+    }
 
     public void getProductsFromDb() {
-        productnames.clear();
 
+        productnames.clear();
         ArrayList<Product> products=dbhandler.getProducts();
         productnames.addAll(products);
         adapter.notifyDataSetChanged();
 
     }
 
+    @Override
+    public void delete(final String productname){
+        AlertDialog.Builder deleteAlert=new AlertDialog.Builder(this);
+        deleteAlert.setMessage("Delete Product?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dbhandler.deleteProduct(productname);
+                        getProductsFromDb();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        })
+                .create();
+        deleteAlert.show();
 
+    }
+
+    @Override
+    public void change(Product product) {
+        dbhandler.deleteProduct(product.get_productname());
+        dbhandler.changeProduct(product);
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -163,12 +160,29 @@ public class MainActivity extends ActionBarActivity implements DbItemDeleteListe
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+
+        }
+        if(id==R.id.DeleteList){
+            AlertDialog.Builder deleteAlert=new AlertDialog.Builder(this);
+            deleteAlert.setMessage("Delete All Products?")
+                    .setPositiveButton("Delete All", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dbhandler.deleteAllProducts();
+                            productnames.clear();
+                            adapter.notifyDataSetChanged();
+                        }
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            })
+                    .create();
+            deleteAlert.show();
+
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
 }
