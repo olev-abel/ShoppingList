@@ -5,7 +5,7 @@
     <color name="accentColor">#E91E63</color>
     <color name="accentColor_pressed">#F50057</color>
     <color name="rippleColor">#F06292</color>
-    <color name="checkColor">#76FF03</color>
+    <color name="checkColor">#43A047</color>
     <color name="deleteColor">#F44336</color>
 
 </resources>

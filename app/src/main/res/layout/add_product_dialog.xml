@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="24dp"
         android:paddingTop="24dp"
-        android:src="@drawable/ic_add_product_dialog" />
+        android:src="@drawable/ic_database_plus_black_24dp" />
 
     <TextView
         android:id="@+id/AddProductDialogTitle"
